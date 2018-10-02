@@ -10,15 +10,15 @@ After installing the Heroku Toolbelt, open a terminal and login to your account:
 ```bash
 $ heroku login
 Enter your Heroku credentials.
-Email: newtonkiragu@herokudeploying.com
-Password (typing will be hidden):
+Email: maxwellmutinda@outlook.com
+Password (typing will be hidden): *************
 Authentication successful.
 ```
 
 # Preparing the Application
-In this tutorial I will be using a repo which is in development which is [ArtExtractKe](https://github.com/Benard18/ArtExtractKe)
+In this tutorial I will be using a repo which is in development which is [NetFlix](https://github.com/vonmutinda/NetFlix)
 It's an very simple  Django project, that shows various categories and their companies.
-Its available on [github](https://github.com/Benard18/ArtExtractKe) so you can actually clone the repository and follow along or try it on your own existing django project.
+Its available on [github](https://github.com/vonmutinda/Netflix) so you can actually clone the repository and follow along or try it on your own existing django project.
 
 ## Assumptions
 * Your familiar with the basics of django e.g concept of apps, settings, urls, basics of databases 
@@ -30,9 +30,9 @@ We need to add the following to our project, we will cover each of them in detai
 
 * Add a `Procfile` in the project root;
 * Add `requirements.txt` file with all the requirements in the project root;
-* Add `Gunicorn` to `requirements.txt`;
-* A `runtime.txt` to specify the correct Python version in the project root;
-* Configure `whitenoise` to serve static files.
+* Add `Gunicorn` to `requirements.txt`; ( `pip install gunicorn && pip freeze > requirements.txt` )
+* A `runtime.txt` to specify the correct Python version in the project root; Add `python-3.6.6` only !
+* Configure `whitenoise` to serve static files. ( I'll show you how as we progress )
 
 ## Procfile
 Heroku apps include a `Procfile` that specifies the commands that are executed by the app’s dynos. 
@@ -42,6 +42,11 @@ For more information read on the [heroku documentation](https://devcenter.heroku
 Create a file named `Procfile` in the project root with the following content:
 ```
 web: gunicorn your_project_name.wsgi
+```
+
+for my case it's :
+```
+web: gunicorn netflix.wsgi
 ```
 
 ## Runtime.txt
@@ -122,7 +127,7 @@ whitenoise==3.3.1
 ```
 If you are following along with the mtribune app you should use the provided `requirements.txt` as you need to install more python packages, for any app just make sure you have the above packages as a plus.(Do not forget the pkg bug..remove it)
 
-## Optional but very helpfull settings
+## Other Settings 
 ### python-decouple and dj-database-url
 Python Decouple is a must have app if you are developing with Django. It’s important to keep your application credentials like API Keys, Amazon S3, email parameters, database parameters safe, specially if it’s an open source repository. Also no more development_settings.py and production_settings.py, use just one settings.py for your whole project.
 
@@ -133,18 +138,22 @@ dj-database-url is a simple Django utility allows you to utilize the 12factor in
 Install it via `pip install dj-database-url`
 
 Firts create a `.env` file and add it to `.gitignore` so you don’t commit any sensitive data to your remote repository.
+```bash
+And btw if you are on `vscode` get dotENV extension . 
+```
 below is an example of configurations you can add to the `.env` file.
 
 ```python
-#just an example, dont share your .env settings
+# just an example, dont share your .env settings
+# I recommend just inserting an asterisk (*) in the ALLOWED HOSTS 
 SECRET_KEY='342s(s(!hsjd998sde8$=o4$3m!(o+kce2^97kp6#ujhi'
 DEBUG=True
-DB_NAME='tribune'
-DB_USER='user'
-DB_PASSWORD='password'
+DB_NAME='nexflix'
+DB_USER='mutinda'
+DB_PASSWORD='12345'
 DB_HOST='127.0.0.1'
 MODE='dev'
-ALLOWED_HOSTS='<app name in heroku>.herokuapp.com'
+ALLOWED_HOSTS='*'
 DISABLE_COLLECTSTATIC=1
 ```
 
@@ -193,6 +202,10 @@ Next create the heroku app
 ```bash
 heroku create <your-app>
 ```
+My case would be :
+```bash
+heroku create internetflix
+```
 
 Create a postgres addon to your heroku app
 ```bash
@@ -210,13 +223,21 @@ Alternatively you can add all your configurations in `.env` file directly to her
 ```bash
 heroku config:set $(cat .env | sed '/^$/d; /#[[:print:]]*$/d')
 ```
-Remember to first set `DEBUG` to false and confirm that you have added all the confuguration variables needed.
 
 ![Imgur](https://i.imgur.com/D0s6BkV.png?1)
 
 ### pushing to heroku
 
 confirm that your application is running as expected before pushing, runtime errors will cause deployment to fail so make sure you have no bugs, you have all the following `Procfile`, `requirements.txt` with all required packages and  `runtime.txt` .
+
+```bash
+$ git add .
+$ git commit -m "Deployment"
+```
+Alternatively : ( Only works if you have done few changes . )
+```bash
+$ git commit -a -m "Deployment" 
+```
 
 ```bash
 $ git push heroku master
@@ -280,10 +301,10 @@ remote: -----> Compressing...
 remote:        Done: 56.3M
 remote: -----> Launching...
 remote:        Released v6
-remote:        https://mtr1bune.herokuapp.com/ deployed to Heroku
+remote:        https://internetflix.herokuapp.com/ deployed to Heroku
 remote: 
 remote: Verifying deploy... done.
-To https://git.heroku.com/mtr1bune.git
+To https://github.com/vonmutinda/internetflix.git
  * [new branch]      master -> master
 
  ```
@@ -298,7 +319,7 @@ If you instead wish to push your postgres database data to heroku then run
 $ heroku pg:reset
 $ heroku pg:push <The name of the db in the local psql> DATABASE_URL --app <heroku-app>
 ```
-You can the open the app in your browser [mtribune](http://mtr1bune.herokuapp.com/ )
+You can the open the app in your browser [NetFlix](http://internetflix.herokuapp.com/ )
 
 # Comment
 This process was a lot and you can easily mess up as I did, I suggest analyzing the part where you went wrong and going back to read on what you are supposed to do. I also highly recommend going through official documentations about deploying python projects to heroku as you will get a lot information that can help you debug effectively. I will provide some links in the resources section.
@@ -320,5 +341,6 @@ Remember heroku does not offer support for media files in the free tier subscrip
 * https://simpleisbetterthancomplex.com/tutorial/2016/08/09/how-to-deploy-django-applications-on-heroku.html
 * https://simpleisbetterthancomplex.com/2015/11/26/package-of-the-week-python-decouple.html
 
-
+##
+* Also check out Original version of this gist from should mine fail  [BenKaranja](https://github.com/Benard18/Deployment_to_heroku_django)
 
