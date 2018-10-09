@@ -317,7 +317,16 @@ To https://github.com/vonmutinda/internetflix.git
 If you instead wish to push your postgres database data to heroku then run
 ```bash
 $ heroku pg:reset
-$ heroku pg:push <The name of the db in the local psql> DATABASE_URL --app <heroku-app>
+$ heroku pg:push <db_name> DATABASE_URL --app <heroku-app> [ or just ]
+$ heroku pg:push <db_name> DATABASE_URL
+```
+
+### For my case :
+```
+bash
+$ heroku pg:reset
+$ heroku pg:push netflix DATABASE_URL --app <internetflix [ or just ]
+$ heroku pg:push netflix DATABASE_URL
 ```
 You can the open the app in your browser [NetFlix](http://internetflix.herokuapp.com/ )
 
